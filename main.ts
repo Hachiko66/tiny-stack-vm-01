@@ -23,10 +23,11 @@ function execute(prog: Uint8Array, inp: Uint8Array): { bytes: Uint8Array; code: 
   let ip = 0;
   let pc = 0;
   let done = 0;
+  const n = prog.length;
   const finish = (code: number): { bytes: Uint8Array; code: number } => ({ bytes: Uint8Array.from(out), code });
   while (true) {
     if (done === 1000000) return finish(10);
-    if (pc < 0 || pc >= prog.length) return finish(9);
+    if (pc < 0 || pc >= n) return finish(9);
     const byte = prog[pc];
     // How many stack values each opcode takes and leaves, and how long its
     // immediate is. Unknown bytes trap 5 before anything else happens.
@@ -49,7 +50,7 @@ function execute(prog: Uint8Array, inp: Uint8Array): { bytes: Uint8Array; code: 
       case 0x00: case 0x34: break;
       default: return finish(5);
     }
-    if (pc + imm >= prog.length && imm > 0) return finish(9);
+    if (pc + imm >= n && imm > 0) return finish(9);
     done++;
     const after = pc + 1 + imm;
     if (sp < need) return finish(2);
